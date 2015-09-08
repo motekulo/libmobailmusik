@@ -1,0 +1,41 @@
+libmobailmusik
+==============
+
+Utility library for Android music production apps
+
+Components
+----------
+
+SoundView
+~~~~~~~~~
+
+Provides a simple, fixed width wave form view
+
+WavMixer
+~~~~~~~~
+
+Mixes two wave files together
+
+VerticalFader
+~~~~~~~~~~~~~
+
+Vertical fader view - for use in a mixer app, for example.
+
+WavPlayerService
+~~~~~~~~~~~~~~~~
+
+Android service to play different combinations of wav files. At the moment this is specifically linked to the sorts of scenarios needed in an app that uses this library (indeed where the code originated) - Twotrack.
+
+WavRecordService
+~~~~~~~~~~~~~~~~
+
+Android service to record audio in wav file format
+
+WavUtils
+~~~~~~~~
+
+Some utilities to get info from wav files
+
+
+
+
