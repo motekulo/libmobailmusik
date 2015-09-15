@@ -28,7 +28,7 @@ public class FretBoardView extends View {
 
 	int stringStart[]; // x position of string
 
-	GuitarNotePlayer mPlayer;
+	//GuitarNotePlayer mPlayer;
 
 	ShapeDrawable string; 
 	ShapeDrawable fret;
@@ -71,7 +71,7 @@ public class FretBoardView extends View {
 		this.dotsToDraw = dotsToDraw;
 		// Get the appropriate samples loaded up in the Guitar note player
 		Log.i(APP_NAME, "In setDotsToDraw");
-		mPlayer.loadCurrentVoicingSamples(dotsToDraw);
+		//mPlayer.loadCurrentVoicingSamples(dotsToDraw);
 		invalidate();
 
 	}
@@ -88,7 +88,7 @@ public class FretBoardView extends View {
 		//dot = new ShapeDrawable(new RectShape());
 		dotsToDraw = new int[6][3];
 
-		mPlayer = new GuitarNotePlayer(context);
+		//mPlayer = new GuitarNotePlayer(context);
 
 
 		//testDotDraw();
@@ -106,7 +106,7 @@ public class FretBoardView extends View {
 					if (pos < stringStart[i] + stringGapInPixels && pos > stringStart[i] - stringGapInPixels) {
 						Log.i(APP_NAME, "String " + i);
 						if (dotsToDraw[i][1] >= 0) {
-							mPlayer.selectAndPlayFromNote(i);	
+							//mPlayer.selectAndPlayFromNote(i);
 						}
 					}	
 				}
