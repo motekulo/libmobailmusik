@@ -38,4 +38,10 @@ Some utilities to get info from wav files
 
 
 
+Apps using this library
+-----------------------
+
+The library came about through writing an app called "Twotrack", which is
+available in the Google Playstore.
+
 
