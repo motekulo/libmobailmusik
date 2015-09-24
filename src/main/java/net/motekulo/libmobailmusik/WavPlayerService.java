@@ -92,7 +92,7 @@ public class WavPlayerService extends Service implements Runnable {
 	 * runs in the same process as its clients, we don't need to deal with IPC.
 	 */
 	public class PlayLocalBinder extends Binder {
-		WavPlayerService getService() {
+		public WavPlayerService getService() {
 			// Return this instance of LocalService so clients can call public methods
 			return WavPlayerService.this;
 		}

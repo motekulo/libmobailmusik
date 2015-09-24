@@ -16,11 +16,7 @@
 
 package net.motekulo.libmobailmusik;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -45,7 +41,7 @@ import java.nio.ByteBuffer;
 public class WavRecordService extends Service implements Runnable{
 
 	private static final String APP_NAME = "WavRecordService";
-	private static final int TWOTRACKREC_ID = 1;
+	//private static final int TWOTRACKREC_ID = 1;
 	private static final int NUM_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
 	private static final int AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;	
 	private static final int SAMPLERATE = 44100;
@@ -83,7 +79,7 @@ public class WavRecordService extends Service implements Runnable{
 	 */
 	public class RecLocalBinder extends Binder {	
 		
-		WavRecordService getService() {
+		public WavRecordService getService() {
 			// Return this instance of LocalService so clients can call public methods
 			return WavRecordService.this;
 		}
@@ -141,6 +137,7 @@ public class WavRecordService extends Service implements Runnable{
 		} catch (FileNotFoundException e) {
 			
 			e.printStackTrace();
+            return -1;
 		}
 		recordingThread = new Thread(this);
 		//Log.i(APP_NAME, "Rec priority is " + recordingThread.getPriority());
@@ -299,7 +296,9 @@ public class WavRecordService extends Service implements Runnable{
 
 	private String getFilename(){
 		//Log.i(APP_NAME, filetorecord.getAbsolutePath());
-		return (filetorecord.getAbsolutePath());
+
+        return (filetorecord.getAbsolutePath());
+
 	}
 
 
@@ -342,9 +341,7 @@ public class WavRecordService extends Service implements Runnable{
 		deleteTempFile();
 
 		handler.sendMessage(handler.obtainMessage());
-		String ns = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-		mNotificationManager.cancel(TWOTRACKREC_ID);
+
 
 		//Debug.stopMethodTracing();
 
@@ -354,22 +351,22 @@ public class WavRecordService extends Service implements Runnable{
 		//Log.i(APP_NAME, "Recording now...");
 		recordingThread.start();
 
-		// Post a notification in case the user moves to another app
-		String ns = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
-		int icon = R.drawable.record;
-		CharSequence tickerText = "Recording";
-		CharSequence contentTitle = "Twotrack";
-		CharSequence contentText = "Recording in progress...";
-
-		Intent notificationIntent = new Intent(this, TwotrackActivity.class);
-		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-		Notification notification = new Notification(icon, tickerText, System.currentTimeMillis()); //FIXME use Notification.Builder
-		notification.setLatestEventInfo(this, contentTitle, contentText, contentIntent);
-
-		mNotificationManager.notify(TWOTRACKREC_ID, notification);
+//		// Post a notification in case the user moves to another app
+//		String ns = Context.NOTIFICATION_SERVICE;
+//		NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+//		int icon = R.drawable.record;
+//		CharSequence tickerText = "Recording";
+//		CharSequence contentTitle = "Twotrack";
+//		CharSequence contentText = "Recording in progress...";
+//
+//		Intent notificationIntent = new Intent(this, TwotrackActivity.class);
+//		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+//
+//		Notification notification = new Notification(icon, tickerText, System.currentTimeMillis()); //FIXME use Notification.Builder
+//		notification.setLatestEventInfo(this, contentTitle, contentText, contentIntent);
+//
+//		mNotificationManager.notify(TWOTRACKREC_ID, notification);
 
 	}
 
