@@ -57,7 +57,7 @@ public class WavMixer extends Thread{
 	}
 
 	public void setFilesToMix(File fileA, File fileB) {
-		/* Class assumes (so bad...) that file1 is stereo (track1 for twotrack activity
+		/* FIXME Class assumes (so bad...) that file1 is stereo (track1 for twotrack activity
 	     * and file2 is mono (track 2 for twotrack activity)
 	     */	
 		file1 = fileA;

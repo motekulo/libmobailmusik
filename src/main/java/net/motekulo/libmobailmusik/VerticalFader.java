@@ -173,7 +173,7 @@ public class VerticalFader extends View{
 		// left top, right bottom
 		mSlider.setBounds((width/2) - (width/4), 0, (width/2) + (width/4), height);
 		
-		mKnob.setBounds(0, (int)(height * mKnobPosition), width, (int)(height * mKnobPosition + height/8));
+		mKnob.setBounds(0, (int)(height * mKnobPosition), width, (int)(height * mKnobPosition + height/4));
 		
 		mSlider.draw(canvas);
 		mKnob.draw(canvas);
