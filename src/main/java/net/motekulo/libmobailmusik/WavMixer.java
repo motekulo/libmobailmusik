@@ -51,7 +51,7 @@ public class WavMixer extends Thread{
 
 	private boolean userHasCancelled;
 
-	WavMixer(Handler h) {
+	public WavMixer(Handler h) {
 		mHandler = h;
 		latencyAdjust = 0;
 	}

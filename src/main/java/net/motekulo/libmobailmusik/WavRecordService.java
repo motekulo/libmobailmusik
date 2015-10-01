@@ -376,7 +376,7 @@ public class WavRecordService extends Service implements Runnable{
 	 * @param inFilename
 	 * @param outFilename
 	 */	
-	private void copyWaveFile(String inFilename,String outFilename, long latencyAdjustmentTime){
+	private void copyWaveFile(String inFilename, String outFilename, long latencyAdjustmentTime){
 		FileInputStream in = null;
 		FileOutputStream out = null;
 		long totalAudioLen = 0;
@@ -396,8 +396,8 @@ public class WavRecordService extends Service implements Runnable{
 		Log.i(APP_NAME, "latencyAdjustmentFrames is " + latencyAdjustmentFrames);
 
 		// latencyAdjustment is in milliseconds, so need to convert to frames, then bytes
-
-		// Crude hack to squash recurring bug with array size being negative...
+		// Frames are really number of samples here
+		// Latency adjustment time might be negative:
 		int arraySize = (int)Math.abs(latencyAdjustmentFrames) * 2;
 		
 		if (arraySize > 0) {

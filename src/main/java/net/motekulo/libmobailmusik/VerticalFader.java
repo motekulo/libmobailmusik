@@ -32,7 +32,7 @@ import android.view.View;
  */
 
 public class VerticalFader extends View{
-	interface VerticalFaderPositionListener {
+	public interface VerticalFaderPositionListener {
 		void onPositionChange(View view, int newPosition);
 	}
 
@@ -54,8 +54,8 @@ public class VerticalFader extends View{
 	public VerticalFader(Context context) {
 		super(context);
 		final Resources res = context.getResources();
-		mSlider = res.getDrawable(R.drawable.slider_9);
-		mKnob = res.getDrawable(R.drawable.knob_2);
+		mSlider = res.getDrawable(R.drawable.slider);
+		mKnob = res.getDrawable(R.drawable.slider_knob);
 			
 		mKnobPosition = (float)0.25;
 		mPositionListener = null;
@@ -74,8 +74,8 @@ public class VerticalFader extends View{
 	public VerticalFader(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		final Resources res = context.getResources();
-		mSlider = res.getDrawable(R.drawable.slider_9);
-		mKnob = res.getDrawable(R.drawable.knob_2);
+		mSlider = res.getDrawable(R.drawable.slider);
+		mKnob = res.getDrawable(R.drawable.slider_knob);
 		
 		mKnobPosition = (float)0.25;
 		mPositionListener = null;
@@ -97,8 +97,8 @@ public class VerticalFader extends View{
 	public VerticalFader(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		final Resources res = context.getResources();
-		mSlider = res.getDrawable(R.drawable.slider_9);
-		mKnob = res.getDrawable(R.drawable.knob_2);
+		mSlider = res.getDrawable(R.drawable.slider);
+		mKnob = res.getDrawable(R.drawable.slider_knob);
 		
 		mKnobPosition = (float)0.25;
 		mPositionListener = null;
