@@ -47,14 +47,21 @@ public class WavMixer extends Thread{
 	boolean file1longer = false;
 	int progress = 0;
 
-	private long latencyAdjust;
+    int nudgeFrames;
+
+	//private long latencyAdjust;
 
 	private boolean userHasCancelled;
 
 	public WavMixer(Handler h) {
 		mHandler = h;
-		latencyAdjust = 0;
+        nudgeFrames = 0;
+	//	latencyAdjust = 0;
 	}
+
+    public void setNudgeFrames(int nudgeFrames) {
+        this.nudgeFrames = nudgeFrames;
+    }
 
 	public void setFilesToMix(File fileA, File fileB) {
 		/* FIXME Class assumes (so bad...) that file1 is stereo (track1 for twotrack activity
@@ -147,12 +154,26 @@ public class WavMixer extends Thread{
 		float file2sampletomix;
 		float file1sampleL;
 		float file1sampleR;
+
+        // Set up nudge values and skip header
+        int monoByteSkip = 0;
+        int stereoByteSkip = 0;
+
+        if (nudgeFrames < 0) {    // delay mono track
+            monoByteSkip = Math.abs(nudgeFrames * 2 + 44);
+            stereoByteSkip = 44;
+        }
+        if (nudgeFrames >= 0) {    // delay stereo track
+            monoByteSkip = 44;
+            stereoByteSkip = nudgeFrames * 4 + 44;
+        }
         
         int count = 0, n = 0;
         int o = 0;
         try {
-        	in2.skip(44);   // Move past the header
-        	in1.skip(44);   
+
+        	in2.skip(monoByteSkip);
+        	in1.skip(stereoByteSkip);
 			while ((n = in2.read(file2buffer, 0, BUFFER_SIZE)) != -1) {
 				
 				// Read in a file1buffer as well
@@ -168,8 +189,7 @@ public class WavMixer extends Thread{
 				shortbuffFile2.get(file2Shorts);
 					
 				for (int i=0; i < file2Shorts.length; i ++) {   // we only need to change values overlapped by file2 (the overdub)
-				
-					
+
 				 /* If n/2 (because n is bytes and we are working in shorts) is less than Buffer, then write rest of buffer with 0s.
 				  * So if we are at the end of the file, and the bytes read is less than the buffer size, then pad the rest with 0s
 				  * Or not... just leave the file1 values as they were, as they aren't overlapped by file2 for mixing anyway? THey have
@@ -181,7 +201,6 @@ public class WavMixer extends Thread{
 					if (i < n/2) {
 						//Processing as floats so convert first:
 						file2sampletomix = ((float)file2Shorts[i])/0x8000;
-						
 
 						// Get the panning for the mono file sorted
 						chL = file2sampletomix * volL;				
@@ -357,7 +376,7 @@ public class WavMixer extends Thread{
 
 			WriteWaveFileHeader(out, totalAudioLen, totalDataLen,
 					longSampleRate, channels, byteRate);
-			in.skip(latencyAdjust);
+			//in.skip(latencyAdjust);
 			while(in.read(data) != -1){
 				out.write(data);
 			}

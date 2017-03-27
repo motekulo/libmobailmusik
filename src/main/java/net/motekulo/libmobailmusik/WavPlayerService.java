@@ -63,6 +63,10 @@ public class WavPlayerService extends Service implements Runnable {
 
 
 	private int frameOffset = 0;
+
+
+
+	private int nudgeFrames = 0;
 	private long size;  // Size of file in bytes
 
 
@@ -308,6 +312,10 @@ public class WavPlayerService extends Service implements Runnable {
 
 	}
 
+	public void setNudgeFrames(int nudgeFrames) {
+		this.nudgeFrames = nudgeFrames;
+	}
+
 	@Override
 	public void run() {
 		//playStartTime = System.currentTimeMillis();
@@ -414,6 +422,8 @@ public class WavPlayerService extends Service implements Runnable {
 
 		FileInputStream monoStream = null;
 		FileInputStream stereoStream = null;
+		int monoByteSkip = 0;
+        int stereoByteSkip = 0;
 
 		byte[] mono;
 		byte[] stereo;
@@ -434,13 +444,23 @@ public class WavPlayerService extends Service implements Runnable {
 			e.printStackTrace();
 		}
 
+		if (nudgeFrames < 0) {    // delay mono track
+            monoByteSkip = Math.abs(frameOffset * 2 + nudgeFrames * 2 + 44);
+            stereoByteSkip = frameOffset * 4 + 44;
+        }
+        if (nudgeFrames >= 0) {    // delay stereo track
+            monoByteSkip = frameOffset * 2 + 44;
+            stereoByteSkip = frameOffset * 4 + nudgeFrames * 4 + 44;
+        }
+
+
 		// If the user is seeking into the audio, skip the appropriate number of frames
 		try {
 			if (monoStream != null) {
-				monoStream.skip(frameOffset * 2 + 44); // 2 bytes per mono frame
+				monoStream.skip(monoByteSkip); // 2 bytes per mono frame + header
 			}
 			if (stereoStream != null) {
-				stereoStream.skip(frameOffset * 4 + 44); // 4 bytes per stereo frame
+				stereoStream.skip(stereoByteSkip); // 4 bytes per stereo frame
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
