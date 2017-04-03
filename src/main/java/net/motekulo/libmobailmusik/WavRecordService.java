@@ -337,10 +337,10 @@ public class WavRecordService extends Service implements Runnable{
 			}
 
 		}
-		copyWaveFile(getTempFilename(), recordedFileName, latencyAdjustment);
+		copyWaveFile(handler, getTempFilename(), recordedFileName, latencyAdjustment);
 		deleteTempFile();
 
-		handler.sendMessage(handler.obtainMessage());
+		//handler.sendMessage(handler.obtainMessage());
 
 
 		//Debug.stopMethodTracing();
@@ -376,7 +376,7 @@ public class WavRecordService extends Service implements Runnable{
 	 * @param inFilename
 	 * @param outFilename
 	 */	
-	private void copyWaveFile(String inFilename, String outFilename, long latencyAdjustmentTime){
+	private void copyWaveFile(Handler handler, String inFilename, String outFilename, long latencyAdjustmentTime){
 		FileInputStream in = null;
 		FileOutputStream out = null;
 		long totalAudioLen = 0;
@@ -448,6 +448,7 @@ public class WavRecordService extends Service implements Runnable{
 
 			in.close();
 			out.close();
+			handler.sendMessage(handler.obtainMessage());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
