@@ -332,7 +332,7 @@ public class SoundView extends View {
 			int leftBaseline = height/4;
 			int rightBaseline = height/4 * 3;
 
-			for (int i = 0; i < maxVal.length; i++){
+			for (int i = 0; i < maxVal.length; i = i+2){   // i increment speeds things up
 				binLMax = ((float)maxVal[i])/0x8000;
 				binLMin = ((float)minVal[i])/0x8000;
 				binRMax = ((float)maxValR[i]/0x8000);
@@ -373,7 +373,7 @@ public class SoundView extends View {
 			int minlength = 0;
 			int baseline = height/2;
 
-			for (int i = 0; i < maxVal.length; i++){
+			for (int i = 0; i < maxVal.length; i = i+2){
 				binMax = ((float)maxVal[i])/0x8000;
 				binMin = ((float)minVal[i])/0x8000;
 
