@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Denis Crowdy
+ * Copyright (C) 2014-2017 Denis Crowdy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ public class SoundView extends View {
 	private short[] maxValR;
 	private ShapeDrawable mLine;
     private String soundLabel;
+	private int nudgeFrames;
 
 	private int numChannels;
     private File fileToDraw;
@@ -63,7 +64,7 @@ public class SoundView extends View {
     /*
      * A SoundView needs to be able to draw a short wave file over a longer
      * period of time, as there might be another track that is longer, and we
-     * ned to match that overall project length for the shorter track
+     * need to match that overall project length for the shorter track
      */
 	private long timeLength; // The length over which to draw the wave file
 
@@ -111,8 +112,11 @@ public class SoundView extends View {
 		} 
 	};
 
+    public void setNudgeFrames(int nudgeFrames) {
+        this.nudgeFrames = nudgeFrames;
+    }
 
-	public void setFileToDraw(File file, long timeLength){
+    public void setFileToDraw(File file, long timeLength){
 		fileToDraw = file;
 		
 		this.timeLength = timeLength;

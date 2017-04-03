@@ -446,6 +446,7 @@ public class WavPlayerService extends Service implements Runnable {
 
 		if (nudgeFrames < 0) {    // delay mono track
             monoByteSkip = Math.abs(frameOffset * 2 + nudgeFrames * 2 + 44);
+			// FIXME shouldn't it be frameoffset * 2 + Math.abs(nudgeFrames) * 2 + 44; ??
             stereoByteSkip = frameOffset * 4 + 44;
         }
         if (nudgeFrames >= 0) {    // delay stereo track
