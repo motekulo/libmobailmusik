@@ -168,7 +168,11 @@ public class WavRecordService extends Service implements Runnable{
 		
 		int rec_result;
 		filetorecord = file;
+
 		rec_result = initialize();   // should return some sort of value - if an error occurs, then we can pass that back
+        if (filetorecord == null) {
+            rec_result = -1;
+        }
 		return rec_result;
 		
 	}

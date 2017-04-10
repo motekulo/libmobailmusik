@@ -56,7 +56,7 @@ public class SoundView extends View {
 	private short[] maxValR;
 	private ShapeDrawable mLine;
     private String soundLabel;
-	private int nudgeFrames;
+
 
 	private int numChannels;
     private File fileToDraw;
@@ -66,7 +66,8 @@ public class SoundView extends View {
      * period of time, as there might be another track that is longer, and we
      * need to match that overall project length for the shorter track
      */
-	private long timeLength; // The length over which to draw the wave file
+	private long recordingLength; // The length over which to draw the wave file (in frames)
+    private int nudgeFrames;  // number of frames to nudge mono track view by
 
 	private boolean needToRefreshData;
 	private boolean dataFromFileLoaded = false;
@@ -119,7 +120,7 @@ public class SoundView extends View {
     public void setFileToDraw(File file, long timeLength){
 		fileToDraw = file;
 		
-		this.timeLength = timeLength;
+		this.recordingLength = timeLength;   // actually number of stereo frames
 		//getDataFromFile();
 		//if (width > 0) {
 		if (fileToDraw.exists()) {
@@ -163,25 +164,25 @@ public class SoundView extends View {
 		int read = 0;
 
 		/*
-		 * So we have timeLength, which is the total length in milliseconds over
+		 * So we have recordingLength, which is the total length in milliseconds over
 		 * which we want to display the file. The file length in milliseconds might
 		 * well be less than the total time over which we want to display it - another
 		 * track could be longer in other words.
 		 * 
-		 * So need to convert timeLength, which is in milliseconds, to a number of samples
+		 * So need to convert recordingLength, which is in milliseconds, to a number of samples
 		 * 
-		 * x samples in   timeLength milliseconds
+		 * x samples in   recordingLength milliseconds
 		 * 44100 samples in 1000 milliseconds
 		 * 
 		 * 
 		 */
 
-		//timeLength
+		//recordingLength
 		int bytesPerSample = bitsPerSample /8 * numChannels;
 		int numsamples = (int)fileToDraw.length()/bytesPerSample;  // this is frames - change code to reflect this
-		//int numsamples = (int)timeLength/1000 * 44100; // FIXME use getRate from WavUtils for this
-//		numsamples = (int)timeLength;   // HANG ON - timeLength is in frames (so samples - get consistent here); so this works...
-		int binSize = (int)timeLength/width; // so binSize is in samples; width is number of pixels
+		//int numsamples = (int)recordingLength/1000 * 44100; // FIXME use getRate from WavUtils for this
+//		numsamples = (int)recordingLength;   // HANG ON - recordingLength is in frames (so samples - get consistent here); so this works...
+		int binSize = (int) recordingLength /width; // so binSize is in samples; width is number of pixels
 		byte[] bin = new byte[binSize * bytesPerSample]; //
 
         /*<------------- width in pixels ------------------------------>
@@ -373,10 +374,19 @@ public class SoundView extends View {
 			int minlength = 0;
 			int baseline = height/2;
 
-			for (int i = 0; i < maxVal.length; i = i+2){
-				binMax = ((float)maxVal[i])/0x8000;
-				binMin = ((float)minVal[i])/0x8000;
+			int nudgePoint = (int)((float) nudgeFrames/recordingLength * width);
+            //Log.i(APP_NAME, "nudgePoint: " + nudgePoint);
 
+			for (int i = 0; i < maxVal.length - Math.abs(nudgePoint); i++){
+
+                if (i < nudgePoint) {
+                    binMax = 0;
+                    binMin = 0;
+                } else {
+                    binMax = ((float) maxVal[i - nudgePoint]) / 0x8000;
+                    binMin = ((float) minVal[i - nudgePoint]) / 0x8000;
+
+                }
 				maxlength = (int)(height * binMax)/2;
 				minlength = (int)(height * binMin)/2;
 
