@@ -61,14 +61,10 @@ public class WavPlayerService extends Service implements Runnable {
 	private float stereoVolL = (float)0.8;  
 	private float stereoVolR = (float)0.8;
 
-
 	private int frameOffset = 0;
-
-
 
 	private int nudgeFrames = 0;
 	private long size;  // Size of file in bytes
-
 
 	private boolean playStereo;
 	private boolean playMono;
