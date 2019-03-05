@@ -46,8 +46,8 @@ public class SoundView extends View {
 	private static final int DATA_LOADED = 1;
 
     //	private ShapeDrawable mRect;
-	private int width;
-	private int height;
+	private int viewWidth;
+	private int viewHeight;
     //private float binMaxVal;
 	//private float binMinVal;
 	private short[] minVal;
@@ -122,12 +122,13 @@ public class SoundView extends View {
 		
 		this.recordingLength = timeLength;   // actually number of stereo frames
 		//getDataFromFile();
-		//if (width > 0) {
+		//if (viewWidth > 0) {
 		if (fileToDraw.exists()) {
 			new Thread(new Runnable() {
 				public void run() {
 					if (dataFromFileLoaded == false) {
-						getDataFromFile();
+						int width = viewWidth;
+						getDataFromFile(width);
 					}
 					
 				}
@@ -136,15 +137,16 @@ public class SoundView extends View {
 		
 	}
 
-	private void getDataFromFile(){
+	private void getDataFromFile(int width){
 		while (width == 0) {
-			//Log.i(APP_NAME, "In getDataFromFile and the width is 0...");
+			Log.i(APP_NAME, "In getDataFromFile and the viewWidth is 0...");
 			try {
 				Thread.sleep(100); //FIXME potential infinite loop so bail after a few seconds
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		Log.i(APP_NAME, "in GetDataFromFile and viewWidth is " + viewWidth);
 
         FileInputStream fileStream;
         try {
@@ -182,17 +184,17 @@ public class SoundView extends View {
 		int numsamples = (int)fileToDraw.length()/bytesPerSample;  // this is frames - change code to reflect this
 		//int numsamples = (int)recordingLength/1000 * 44100; // FIXME use getRate from WavUtils for this
 //		numsamples = (int)recordingLength;   // HANG ON - recordingLength is in frames (so samples - get consistent here); so this works...
-		int binSize = (int) recordingLength /width; // so binSize is in samples; width is number of pixels
+		int binSize = (int) recordingLength / width; // so binSize is in samples; viewWidth is number of pixels
 		byte[] bin = new byte[binSize * bytesPerSample]; //
 
-        /*<------------- width in pixels ------------------------------>
+        /*<------------- viewWidth in pixels ------------------------------>
          * -------------------------------------------------------------
          * Wav file that is shorter ends here |
          * |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
          * <->
          * binSize, which is overall timelength of longest track
          * (expressed in frames/samples, though) divided
-         * by the width in pixels
+         * by the viewWidth in pixels
          */
 
 		ByteBuffer binByteBuffer;
@@ -236,7 +238,7 @@ public class SoundView extends View {
 							break;
 						}
 						
-						//if (binNum == width) break; // FIXME - problem just for the final buffer read?
+						//if (binNum == viewWidth) break; // FIXME - problem just for the final buffer read?
 						if (maxValR[binNum] < sample) {
 							maxValR[binNum] = sample;
 						}
@@ -248,7 +250,7 @@ public class SoundView extends View {
 				}
 
 				binNum ++;	
-				if (binNum == width) break;  // FIXME - added during debugging
+				if (binNum >= width) break;  // FIXME - added during debugging
 				//Log.i(APP_NAME, "BinNum is " + binNum);
 				Message msg = handler.obtainMessage();
 				msg.what = NEW_BIN_CALCULATED;
@@ -272,8 +274,8 @@ public class SoundView extends View {
 
 	public void setInvalidate(){
 		invalidate();
-		width = this.getMeasuredWidth();
-		height = this.getMeasuredHeight();
+		viewWidth = this.getMeasuredWidth();
+		viewHeight = this.getMeasuredHeight();
 	}
 
 	public void setRefreshDataFlag(){
@@ -330,8 +332,8 @@ public class SoundView extends View {
 			int minlengthL = 0;
 			int maxlengthR = 0;
 			int minlengthR = 0;
-			int leftBaseline = height/4;
-			int rightBaseline = height/4 * 3;
+			int leftBaseline = viewHeight /4;
+			int rightBaseline = viewHeight /4 * 3;
 
 			for (int i = 0; i < maxVal.length; i = i+2){   // i increment speeds things up
 				binLMax = ((float)maxVal[i])/0x8000;
@@ -339,10 +341,10 @@ public class SoundView extends View {
 				binRMax = ((float)maxValR[i]/0x8000);
 				binRMin = ((float)minValR[i]/0x8000);
 
-				maxlengthL = (int)(height * binLMax)/4;
-				minlengthL = (int)(height * binLMin)/4;
-				maxlengthR = (int)(height * binRMax)/4;
-				minlengthR = (int)(height * binRMin)/4;
+				maxlengthL = (int)(viewHeight * binLMax)/4;
+				minlengthL = (int)(viewHeight * binLMin)/4;
+				maxlengthR = (int)(viewHeight * binRMax)/4;
+				minlengthR = (int)(viewHeight * binRMin)/4;
 
 				mLine.setBounds(i, leftBaseline - (maxlengthL * WAVE_STRETCH), i + 1, leftBaseline - (minlengthL * WAVE_STRETCH));
 				mRightLine.setBounds(i, rightBaseline - (maxlengthR * WAVE_STRETCH), i + 1, rightBaseline - (minlengthR * WAVE_STRETCH));
@@ -360,7 +362,7 @@ public class SoundView extends View {
 		int y = 0;
         ShapeDrawable mRect = new ShapeDrawable(new RectShape());
 		mRect.getPaint().setColor(mcolor);
-		mRect.setBounds(x, y, x + width, y + height);
+		mRect.setBounds(x, y, x + viewWidth, y + viewHeight);
 		float binMax;
 		float binMin;
 		//mRect.draw(canvas);
@@ -372,9 +374,9 @@ public class SoundView extends View {
 		if (maxVal != null) {
 			int maxlength = 0;
 			int minlength = 0;
-			int baseline = height/2;
+			int baseline = viewHeight /2;
 
-			int nudgePoint = (int)((float) nudgeFrames/recordingLength * width);
+			int nudgePoint = (int)((float) nudgeFrames/recordingLength * viewWidth);
             //Log.i(APP_NAME, "nudgePoint: " + nudgePoint);
 
 			for (int i = 0; i < maxVal.length - Math.abs(nudgePoint); i++){
@@ -387,8 +389,8 @@ public class SoundView extends View {
                     binMin = ((float) minVal[i - nudgePoint]) / 0x8000;
 
                 }
-				maxlength = (int)(height * binMax)/2;
-				minlength = (int)(height * binMin)/2;
+				maxlength = (int)(viewHeight * binMax)/2;
+				minlength = (int)(viewHeight * binMin)/2;
 
 				mLine.setBounds(i, baseline - (maxlength * WAVE_STRETCH), i + 1, baseline - (minlength * WAVE_STRETCH));
 				mLine.draw(canvas);
@@ -405,18 +407,18 @@ public class SoundView extends View {
 			axesRect = new ShapeDrawable(new RectShape());
 			axesRect.getPaint().setColor(mcolor);
 
-			axesRect.setBounds(0, height/2, width, height/2 + 2);
+			axesRect.setBounds(0, viewHeight /2, viewWidth, viewHeight /2 + 2);
 			axesRect.draw(canvas);
 		}
 		if (numChannels ==2) {
-			int leftBaseline = height/4;
-			int rightBaseline = height/4 * 3;
+			int leftBaseline = viewHeight /4;
+			int rightBaseline = viewHeight /4 * 3;
 			axesRect = new ShapeDrawable(new RectShape());
 			axesRectR = new ShapeDrawable(new RectShape());
 			axesRect.getPaint().setColor(mcolor);
 			axesRectR.getPaint().setColor(mcolor);
-			axesRect.setBounds(0, leftBaseline, width, leftBaseline + 2);
-			axesRectR.setBounds(0, rightBaseline, width, rightBaseline + 2);
+			axesRect.setBounds(0, leftBaseline, viewWidth, leftBaseline + 2);
+			axesRectR.setBounds(0, rightBaseline, viewWidth, rightBaseline + 2);
 			axesRect.draw(canvas);
 			axesRectR.draw(canvas);
 		}
@@ -441,24 +443,24 @@ public class SoundView extends View {
 		wholeRect = new ShapeDrawable(new RectShape());
 		wholeRect.getPaint().setColor(mcolor);
 
-		wholeRect.setBounds(0, 0, width, height);
+		wholeRect.setBounds(0, 0, viewWidth, viewHeight);
 		wholeRect.draw(canvas);
 
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		height = MeasureSpec.getSize(heightMeasureSpec);
-		width = MeasureSpec.getSize(widthMeasureSpec);
+		viewHeight = MeasureSpec.getSize(heightMeasureSpec);
+		viewWidth = MeasureSpec.getSize(widthMeasureSpec);
 
-		this.setMeasuredDimension(width, height);
+		this.setMeasuredDimension(viewWidth, viewHeight);
 	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		width = w;
-		height = h;
-		//Log.i(APP_NAME, "onSizeChanged called; new width " + width);
+		viewWidth = w;
+		viewHeight = h;
+		//Log.i(APP_NAME, "onSizeChanged called; new viewWidth " + viewWidth);
 
 	}
 
