@@ -327,7 +327,10 @@ public class WavPlayerService extends Service implements Runnable {
 		//Log.i(APP_NAME, "AudioTrack State is " + mAudioTrack.getState());
 
 		//Log.i(APP_NAME, "About to stop and release mAudioTrack");
-		//mAudioTrack.stop();
+		if (mAudioTrack.getState() == AudioTrack.STATE_INITIALIZED) {
+			mAudioTrack.stop();
+		}
+
 
 	}
 

@@ -69,7 +69,7 @@ public class SoundView extends View {
 	private long recordingLength; // The length over which to draw the wave file (in frames)
     private int nudgeFrames;  // number of frames to nudge mono track view by
 
-	private boolean needToRefreshData;
+	//private boolean needToRefreshData;
 	private boolean dataFromFileLoaded = false;
 	private boolean dataIsLoading = false;
 	private boolean isRecording = false; 
@@ -126,9 +126,13 @@ public class SoundView extends View {
 		if (fileToDraw.exists()) {
 			new Thread(new Runnable() {
 				public void run() {
-					if (dataFromFileLoaded == false) {
+					while (dataFromFileLoaded == false) {
+                       // Log.i(APP_NAME, "In thread and the viewWidth is " + viewWidth);
 						int width = viewWidth;
-						getDataFromFile(width);
+						if (width > 0) {
+							getDataFromFile(width);
+						}
+
 					}
 					
 				}
@@ -138,14 +142,14 @@ public class SoundView extends View {
 	}
 
 	private void getDataFromFile(int width){
-		while (width == 0) {
-			Log.i(APP_NAME, "In getDataFromFile and the viewWidth is 0...");
-			try {
-				Thread.sleep(100); //FIXME potential infinite loop so bail after a few seconds
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+//		while (width == 0) {
+//			Log.i(APP_NAME, "In getDataFromFile and the viewWidth is 0...");
+//			try {
+//				Thread.sleep(100); //FIXME potential infinite loop so bail after a few seconds
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
 		Log.i(APP_NAME, "in GetDataFromFile and viewWidth is " + viewWidth);
 
         FileInputStream fileStream;
