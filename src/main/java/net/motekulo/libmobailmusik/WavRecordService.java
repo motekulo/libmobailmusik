@@ -305,6 +305,13 @@ public class WavRecordService extends Service implements Runnable{
 
 	}
 
+	public int checkFileExists(){
+		if (filetorecord.exists()) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
 
 	public void setBufferMultiplier(int mbufferMultiplier) {
 		bufferMultiplier = mbufferMultiplier;
@@ -312,38 +319,50 @@ public class WavRecordService extends Service implements Runnable{
 
 	public void stopRecording(Handler handler, long latencyAdjustment) {
 		Log.i(APP_NAME, "Stopping recording");
-        String recordedFileName = getFilename();  // Trying to fix a recurring crash, so just call this once in 0.7.6
-		if(recorder != null && recorder.getState() != AudioRecord.STATE_UNINITIALIZED) {
+		if (filetorecord == null) {
+			/* It's possible to get here and there is no file recorded yet; bug
 
-			isRecording = false;
-			//Log.i(APP_NAME, "Set isRecording to false");
+			 */
+			Log.i(APP_NAME, "filetorecord is null so bailing");
+			Message msg = recServiceHandler.obtainMessage();
+			msg.what = 	2;
 
-			recorder.stop();
-			recorder.release();
-			//Log.i(APP_NAME, "recorder stopped and released");
+			recServiceHandler.sendMessage(msg);
 
-		}
+		} else {
 
-		//First make a backup of the previously recorded take:
-		String bkpFileName = recordedFileName + ".bkp";
-		File bkpFile = new File(bkpFileName);
+			String recordedFileName = getFilename();
+			if (recorder != null && recorder.getState() != AudioRecord.STATE_UNINITIALIZED) {
 
-		File recordedFile = new File(recordedFileName);
-		if (recordedFile.exists()) {    // might be stopping after a bounce operation, so no 2.wav yet
-			try {
+				isRecording = false;
+				//Log.i(APP_NAME, "Set isRecording to false");
 
-				FileUtils.copyFile(recordedFile, bkpFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				recorder.stop();
+				recorder.release();
+				//Log.i(APP_NAME, "recorder stopped and released");
+
 			}
 
-		}
-		copyWaveFile(handler, getTempFilename(), recordedFileName, latencyAdjustment);
-		deleteTempFile();
+			//First make a backup of the previously recorded take:
+			String bkpFileName = recordedFileName + ".bkp";
+			File bkpFile = new File(bkpFileName);
 
+			File recordedFile = new File(recordedFileName);
+			if (recordedFile.exists()) {    // might be stopping after a bounce operation, so no 2.wav yet
+				try {
+
+					FileUtils.copyFile(recordedFile, bkpFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				}
+
+			}
+			copyWaveFile(handler, getTempFilename(), recordedFileName, latencyAdjustment);
+			deleteTempFile();
+		}
 		//handler.sendMessage(handler.obtainMessage());
 
 
