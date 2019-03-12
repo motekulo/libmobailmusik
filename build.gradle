@@ -36,3 +36,13 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.3.2'
     }
 }
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+dependencies {
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.9') {
+        transitive = true;
+    }
+}

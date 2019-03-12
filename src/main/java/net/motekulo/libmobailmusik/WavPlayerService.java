@@ -26,6 +26,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -275,7 +277,15 @@ public class WavPlayerService extends Service implements Runnable {
 	public void stopPlaying(){
 		if (mAudioTrack != null) {
 			shouldPlay = false;
-			mAudioTrack.stop();
+            Crashlytics.setInt("mAudioTrackPlayState",  mAudioTrack.getPlayState());
+
+			try {
+				mAudioTrack.stop();
+				//throw IllegalStateException;
+			} catch (IllegalStateException e) {
+				Crashlytics.logException(e);
+				//e.printStackTrace();
+			}
 			//mAudioTrack.release();
 
 		}
