@@ -144,23 +144,27 @@ public class WavPlayerService extends Service implements Runnable {
 	 * @param file
 	 */
 	public void setFileToPlay(File file) {
-		//Log.i(APP_NAME, "numchannels is " + WavUtils.getNumChannels(file));
-		if (WavUtils.getNumChannels(file) == 1) {
-			//Log.i(APP_NAME, "in setFileToPlay and numChannels is 1");
-			monoFile = file;
-			playMono = true;
-			playStereo = false;
-			playMix = false;
-			size = monoFile.length() * 2; 
-		}
-		if (WavUtils.getNumChannels(file) == 2) {
-			//Log.i(APP_NAME, "in setFileToPlay and numChannels is 2");
-			stereoFile = file;
-			playStereo = true;
-			playMono = false;
-			playMix = false;
-			size = stereoFile.length();
-		}
+
+		// For testing purposes:
+		//file = null;
+		if (file != null) {
+            if (WavUtils.getNumChannels(file) == 1) {
+                //Log.i(APP_NAME, "in setFileToPlay and numChannels is 1");
+                monoFile = file;
+                playMono = true;
+                playStereo = false;
+                playMix = false;
+                size = monoFile.length() * 2;
+            }
+            if (WavUtils.getNumChannels(file) == 2) {
+                //Log.i(APP_NAME, "in setFileToPlay and numChannels is 2");
+                stereoFile = file;
+                playStereo = true;
+                playMono = false;
+                playMix = false;
+                size = stereoFile.length();
+            }
+        }
 
 		initialise();
 

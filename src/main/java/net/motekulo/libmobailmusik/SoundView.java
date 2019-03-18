@@ -28,6 +28,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -218,11 +220,17 @@ public class SoundView extends View {
 				binShortsBuffer.rewind();
 				//int n;
 				short sample;
+               // BufferUnderflowException testError = new BufferUnderflowException();
+               // throw testError;
 				for (int i=0, n = binShortsBuffer.remaining(); i < n; i = i + (numChannels * SAMPLE_SKIP)) {
 					try {
+
 						sample = binShortsBuffer.get();
+
+
 					} catch (BufferUnderflowException e) {
 						Log.i(APP_NAME, "caught buffer underflow exception ");
+						Crashlytics.logException(e);
 						break;
 					}
 
@@ -239,6 +247,7 @@ public class SoundView extends View {
 							sample = binShortsBuffer.get();
 						} catch (BufferUnderflowException e) {
 							Log.i(APP_NAME, "caught buffer underflow exception ");
+							Crashlytics.logException(e);
 							break;
 						}
 						
