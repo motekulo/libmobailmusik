@@ -109,7 +109,7 @@ public class SoundView extends View {
 			if (msg.what == DATA_LOADED) {
 				//Log.i(APP_NAME, "Handling data loaded...");
 			
-				invalidate();			
+				//invalidate();
 			}
 			
 		} 
@@ -128,11 +128,16 @@ public class SoundView extends View {
 		if (fileToDraw.exists()) {
 			new Thread(new Runnable() {
 				public void run() {
+				    int i = 0;
 					while (dataFromFileLoaded == false) {
-                       // Log.i(APP_NAME, "In thread and the viewWidth is " + viewWidth);
+                        Log.i(APP_NAME, "test1: In thread and the viewWidth is " + viewWidth);
+                        getDataFromFile();
 						int width = viewWidth;
 						if (width > 0) {
-							getDataFromFile(width);
+						    i++;
+						    Log.i(APP_NAME, "test1: getDataFromFile call number " + i);
+						    adjustForWidth(width);
+							//getDataFromFile(width);
 						}
 
 					}
@@ -143,7 +148,31 @@ public class SoundView extends View {
 		
 	}
 
-	private void getDataFromFile(int width){
+	private void adjustForWidth(int width) {
+        int binSize = 5000/width;
+        int binNum = 0;
+        short maxSoFar = 0;
+        short minSoFar = 0;
+        for (int i = 0; i < 5000; i++) {
+            if (maxSoFar < maxVal[i]) {
+                maxSoFar = maxVal[i];
+            }
+            if (minSoFar < minVal[i]) {
+                minSoFar = minVal[i];
+            }
+            if (i % binSize == 0) {
+                maxVal[binNum] = maxSoFar;
+                minVal[binNum] = minSoFar;
+
+                Log.i(APP_NAME, "BinNum is " + binNum);
+                Message msg = handler.obtainMessage();
+                msg.what = NEW_BIN_CALCULATED;
+                handler.sendMessage(msg);
+            }
+        }
+    }
+
+	private void getDataFromFile(){
 //		while (width == 0) {
 //			Log.i(APP_NAME, "In getDataFromFile and the viewWidth is 0...");
 //			try {
@@ -152,7 +181,7 @@ public class SoundView extends View {
 //				e.printStackTrace();
 //			}
 //		}
-		Log.i(APP_NAME, "in GetDataFromFile and viewWidth is " + viewWidth);
+		//Log.i(APP_NAME, "test1: in getDataFromFile and viewWidth is " + viewWidth);
 
         FileInputStream fileStream;
         try {
@@ -190,7 +219,7 @@ public class SoundView extends View {
 		int numsamples = (int)fileToDraw.length()/bytesPerSample;  // this is frames - change code to reflect this
 		//int numsamples = (int)recordingLength/1000 * 44100; // FIXME use getRate from WavUtils for this
 //		numsamples = (int)recordingLength;   // HANG ON - recordingLength is in frames (so samples - get consistent here); so this works...
-		int binSize = (int) recordingLength / width; // so binSize is in samples; viewWidth is number of pixels
+		int binSize = (int) recordingLength / 5000; // Arbitrary value (5000) greater than number of width pixels
 		byte[] bin = new byte[binSize * bytesPerSample]; //
 
         /*<------------- viewWidth in pixels ------------------------------>
@@ -206,10 +235,10 @@ public class SoundView extends View {
 		ByteBuffer binByteBuffer;
 		ShortBuffer binShortsBuffer;
 		//FloatBuffer binFloatsBuffer;
-		maxVal = new short[width];
-		minVal = new short[width];
-		maxValR = new short[width];
-		minValR = new short[width];
+		maxVal = new short[5000];
+		minVal = new short[5000];
+		maxValR = new short[5000];
+		minValR = new short[5000];
 		int binNum = 0;
 		try {
 			fileStream.skip(44);   // Don't want to draw the header
@@ -234,7 +263,7 @@ public class SoundView extends View {
 						break;
 					}
 
-					if (binNum >= width) break; // FIXME - problem just for the final buffer read?
+					if (binNum >= 5000) break; // FIXME - problem just for the final buffer read?
 					if (maxVal[binNum] < sample) {
 						maxVal[binNum] = sample;
 					}
@@ -263,11 +292,11 @@ public class SoundView extends View {
 				}
 
 				binNum ++;	
-				if (binNum >= width) break;  // FIXME - added during debugging
+				if (binNum >= 5000) break;  // FIXME - added during debugging
 				//Log.i(APP_NAME, "BinNum is " + binNum);
-				Message msg = handler.obtainMessage();
-				msg.what = NEW_BIN_CALCULATED;
-				handler.sendMessage(msg);
+				//Message msg = handler.obtainMessage();
+				//msg.what = NEW_BIN_CALCULATED;
+				//handler.sendMessage(msg);
 			}
 
 		} catch (IOException e) {
@@ -348,7 +377,7 @@ public class SoundView extends View {
 			int leftBaseline = viewHeight /4;
 			int rightBaseline = viewHeight /4 * 3;
 
-			for (int i = 0; i < maxVal.length; i = i+2){   // i increment speeds things up
+			for (int i = 0; i < viewWidth; i = i+2){   // i increment speeds things up
 				binLMax = ((float)maxVal[i])/0x8000;
 				binLMin = ((float)minVal[i])/0x8000;
 				binRMax = ((float)maxValR[i]/0x8000);
@@ -392,7 +421,7 @@ public class SoundView extends View {
 			int nudgePoint = (int)((float) nudgeFrames/recordingLength * viewWidth);
             //Log.i(APP_NAME, "nudgePoint: " + nudgePoint);
 
-			for (int i = 0; i < maxVal.length - Math.abs(nudgePoint); i++){
+			for (int i = 0; i < viewWidth - Math.abs(nudgePoint); i++){
 
                 if (i < nudgePoint) {
                     binMax = 0;
